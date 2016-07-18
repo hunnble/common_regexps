@@ -1,2 +1,2 @@
-# common_regexps
+# cr.js
 commonly used regular expressions
