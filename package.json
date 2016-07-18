@@ -1,0 +1,23 @@
+{
+  "name": "common_regexps",
+  "version": "0.0.1",
+  "description": "commonly used regular expressions",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/**/*_test.js -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hunnble/common_regexps.git"
+  },
+  "author": "hunnble",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hunnble/common_regexps/issues"
+  },
+  "homepage": "https://github.com/hunnble/common_regexps#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  }
+}
