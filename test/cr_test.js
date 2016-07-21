@@ -1,13 +1,14 @@
 var chai = require('chai');
-var cr = require('../index.js');
+var CR = require('../index.js');
 var assert = chai.assert;
+var cr = new CR();
 
-describe('chinese character', function () {
+describe('Chinese character', function () {
     it('Should return an instance of RegExp', function () {
         assert.isOk(cr.chineseChar() instanceof RegExp);
     });
     it('Should only match a Chinese character', function () {
-        assert.isOk(cr.chineseChar().test('冄'));
+        assert.isOk(cr.chineseChar().test('胖'));
         assert.isNotOk(cr.chineseChar().test('，。？！,.?!1234567890'));
         assert.isNotOk(cr.chineseChar().test('qwertyuiopasdfghjklzxcvbnm'));
         assert.isOk(cr.chineseChar().test('你好world'));
@@ -15,20 +16,55 @@ describe('chinese character', function () {
             exclusive: true
         }).test('你好world'));
     });
+    it('Could specify maximum and minimum length', function () {
+        assert.isOk(cr.chineseChar({
+            multiple: true,
+            exclusive: true
+        }).test('多个汉字'));
+        assert.isOk(cr.chineseChar({
+            minLen: 2,
+            exclusive: true
+        }).test('只给最小长度'));
+        assert.isOk(cr.chineseChar({
+            minLen: 2,
+            maxLen: 8,
+            exclusive: true
+        }).test('给出最大最小长度'));
+        assert.isNotOk(cr.chineseChar({
+            minLen: 10,
+            exclusive: true
+        }).test('最大最小长度限制'));
+        assert.isNotOk(cr.chineseChar({
+            maxLen: 2,
+            exclusive: true
+        }).test('最大最小长度限制'));
+    });
 });
 
-describe('chinese characters', function () {
+describe('English character', function () {
     it('Should return an instance of RegExp', function () {
-        assert.isOk(cr.chineseChars() instanceof RegExp);
+        assert.isOk(cr.englishChar() instanceof RegExp);
     });
-    it('Should only match Chinese characters', function () {
-        assert.isOk(cr.chineseChars().test('你好世界'));
-        assert.isNotOk(cr.chineseChar().test('，。？！,.?!1234567890'));
-        assert.isNotOk(cr.chineseChars().test('hello world'));
-        assert.isOk(cr.chineseChars().test('你好world'));
-        assert.isNotOk(cr.chineseChars({
-            exclusive: true
-        }).test('你好world'));
+    it('Should only match an English character', function () {
+        assert.isOk(cr.englishChar().test('qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'));
+        assert.isNotOk(cr.englishChar({
+            lowercase: false
+        }).test('qwertyuiopasdfghjklzxcvbnm'));
+        assert.isNotOk(cr.englishChar({
+            uppercase: false
+        }).test('QWERTYUIOPASDFGHJKLZXCVBNM'));
+    });
+});
+
+describe('Number', function () {
+    it('Should return an instance of RegExp', function () {
+        assert.isOk(cr.englishChar() instanceof RegExp);
+    });
+    it('Should only match number format', function () {
+        assert.isOk(cr.number({
+            exclusive: true,
+            multiple: true
+        }).test('1234567890'));
     });
 });
 
@@ -37,7 +73,10 @@ describe('email', function () {
         assert.isOk(cr.email() instanceof RegExp);
     });
     it('Should only match the email format', function () {
-        assert.isOk(cr.email().test('ASDASDzxczxceqweouo1234567890@163.com'));
+        assert.isOk(cr.email({
+            exclusive: true,
+            multiple: true
+        }).test('ASDASDzxczxceqweouo1234567890@163.com'));
         assert.isOk(cr.email().test('CZXCZX1234567890czxbcjkwqau@qq.com'));
         assert.isOk(cr.email().test('UYTU1234567890dsahjkdsa@sina.com'));
     });
@@ -132,5 +171,57 @@ describe('identity card number', function () {
         assert.isNotOk(cr.idCard({
             exclusive: true
         }).test(34567820010229565 + 'X'));
+    });
+});
+
+describe('includes', function () {
+    it('Should return a Boolean value', function () {
+        assert.typeOf(cr.includes('', ''), 'boolean');
+    });
+    it('Should run well while the type of parameter "search" is string', function () {
+        assert.isOk(cr.includes('abcde', 'bcd'));
+        assert.isOk(cr.includes('abcde', 'bcde', 1));
+        assert.isNotOk(cr.includes('abcde', 'abc', 1));
+        assert.isNotOk(cr.includes('abcde', 'abcdea'));
+    });
+    it('Should run well while the type of parameter "search" is regexp', function () {
+        assert.isOk(cr.includes('abcde', /bc/));
+        assert.isOk(cr.includes('abcde', /bcde/, 1));
+        assert.isOk(cr.includes('ABCDE', /ab/i));
+        assert.isNotOk(cr.includes('abcde', /ab/, 1));
+    });
+});
+
+describe('startsWith', function () {
+    it('Should return a Boolean value', function () {
+        assert.typeOf(cr.startsWith('', ''), 'boolean');
+    });
+    it('Should run well while the type of parameter "search" is string', function () {
+        assert.isOk(cr.startsWith('abcde', 'ab'));
+        assert.isOk(cr.startsWith('abcde', 'bc', 1));
+        assert.isNotOk(cr.startsWith('abcde', 'bc'));
+        assert.isNotOk(cr.startsWith('abcde', 'ab', 1));
+    });
+    it('Should run well while the type of parameter "search" is regexp', function () {
+        assert.isOk(cr.startsWith('abcde', /ab/));
+        assert.isOk(cr.startsWith('abcde', /bc/, 1));
+        assert.isOk(cr.startsWith('ABCDE', /ab/i));
+        assert.isNotOk(cr.startsWith('abcde', /bc/g));
+        assert.isNotOk(cr.startsWith('abcde', /ab/, 1));
+    });
+});
+
+describe('endsWith', function () {
+    it('Should run well while the type of parameter "search" is string', function () {
+        assert.isOk(cr.endsWith('abcde', 'de'));
+        assert.isOk(cr.endsWith('abcde', 'bc', 3));
+        assert.isNotOk(cr.endsWith('abcde', 'bc'));
+    });
+    it('Should run well while the type of parameter "search" is regexp', function () {
+        assert.isOk(cr.endsWith('abcde', /de/));
+        assert.isOk(cr.endsWith('abcde', /bc/, 3));
+        assert.isOk(cr.endsWith('ABCDE', /de/i));
+        assert.isNotOk(cr.endsWith('abcde', /bc/g));
+        assert.isNotOk(cr.endsWith('abcde', /de/, 3));
     });
 });
